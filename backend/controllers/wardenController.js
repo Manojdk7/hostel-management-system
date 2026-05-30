@@ -45,12 +45,27 @@ exports.getTodayDashboard = async (req, res) => {
     ).length;
     const absentToday = Math.max(totalStudents - presentToday, 0);
 
+    const presentStudents = hostelAttendance.map(a => ({
+      name: a.studentId.name,
+      studentId: a.studentId.studentId,
+      roomNumber: a.studentId.roomNumber,
+      morning: a.morningCheckIn.status,
+      afternoon: a.afternoonCheckIn.status,
+      night: a.nightCheckIn.status,
+      meals: {
+        breakfast: a.meals.breakfast.selected,
+        lunch: a.meals.lunch.selected,
+        dinner: a.meals.dinner.selected
+      }
+    }));
+
     return res.status(200).json({
       success: true,
       date: today,
       totalStudents,
       presentToday,
       absentToday,
+      presentStudents,
       
       morning: {
         present: morningPresent,
@@ -77,6 +92,7 @@ exports.getTodayDashboard = async (req, res) => {
         totalStudents,
         presentToday,
         absentToday,
+        presentStudents,
         morningAttendance: {
           present: morningPresent,
           absent: morningAbsent
