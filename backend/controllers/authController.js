@@ -49,8 +49,8 @@ exports.registerStudent = async (req, res) => {
       password,
       hostelName,
       roomNumber,
-      hostelLatitude: 28.5244,
-      hostelLongitude: 77.1855
+      hostelLatitude: 14.4644,
+      hostelLongitude: 75.9217
     });
 
     await student.save();

@@ -13,9 +13,9 @@ function StudentCheckInPage({ user, onLogout }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const HOSTEL_LATITUDE = user?.hostelLatitude || 28.5244;
-  const HOSTEL_LONGITUDE = user?.hostelLongitude || 77.1855;
-  const GEOFENCE_RADIUS = user?.allowedRadius || 2000;
+  const HOSTEL_LATITUDE = user?.hostelLatitude || 14.4644;
+  const HOSTEL_LONGITUDE = user?.hostelLongitude || 75.9217;
+  const GEOFENCE_RADIUS = user?.allowedRadius || 20000;
 
   useEffect(() => {
     getStudentLocation();
