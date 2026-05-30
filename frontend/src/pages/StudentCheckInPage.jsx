@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/CheckInPage.css';
+import '../styles/checkInPage.css';
 
 function StudentCheckInPage({ user, onLogout }) {
   const navigate = useNavigate();
