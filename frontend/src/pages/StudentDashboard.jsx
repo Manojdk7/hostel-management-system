@@ -87,7 +87,11 @@ function StudentDashboard({ user, onLogout }) {
             <h4>Breakfast</h4>
             <p className="status-time">6:00 AM - 8:00 AM</p>
             <div className="status-badge">
-              {todayStatus?.morningCheckIn?.status === 'present' ? '✅ Present' : '⏳ Not Checked'}
+              {todayStatus?.morningCheckIn?.status === 'present' 
+                ? '✅ Present' 
+                : todayStatus?.morningCheckIn?.status === 'out_of_city'
+                ? '📍 Out of City'
+                : '⏳ Not Checked'}
             </div>
           </div>
 
@@ -96,7 +100,11 @@ function StudentDashboard({ user, onLogout }) {
             <h4>Lunch</h4>
             <p className="status-time">12:00 PM - 2:00 PM</p>
             <div className="status-badge">
-              {todayStatus?.afternoonCheckIn?.status === 'present' ? '✅ Present' : '⏳ Not Checked'}
+              {todayStatus?.afternoonCheckIn?.status === 'present' 
+                ? '✅ Present' 
+                : todayStatus?.afternoonCheckIn?.status === 'out_of_city'
+                ? '📍 Out of City'
+                : '⏳ Not Checked'}
             </div>
           </div>
 
@@ -105,7 +113,11 @@ function StudentDashboard({ user, onLogout }) {
             <h4>Dinner</h4>
             <p className="status-time">6:00 PM - 8:00 PM</p>
             <div className="status-badge">
-              {todayStatus?.nightCheckIn?.status === 'present' ? '✅ Present' : '⏳ Not Checked'}
+              {todayStatus?.nightCheckIn?.status === 'present' 
+                ? '✅ Present' 
+                : todayStatus?.nightCheckIn?.status === 'out_of_city'
+                ? '📍 Out of City'
+                : '⏳ Not Checked'}
             </div>
           </div>
         </div>

@@ -49,7 +49,7 @@ const studentSchema = new mongoose.Schema({
   },
   allowedRadius: {
     type: Number,
-    default: 2000
+    default: 20000
   },
   isActive: {
     type: Boolean,

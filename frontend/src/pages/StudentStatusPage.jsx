@@ -40,6 +40,13 @@ function StudentStatusPage({ user, onLogout }) {
     return '❌';
   };
 
+  const formatStatusText = (status) => {
+    if (status === 'present') return 'Present';
+    if (status === 'out_of_city') return 'Out of City';
+    if (status === 'absent') return 'Absent';
+    return 'Not Checked In';
+  };
+
   const getTimeWindow = (meal) => {
     const times = {
       breakfast: '6:00 AM - 8:00 AM',
@@ -91,7 +98,7 @@ function StudentStatusPage({ user, onLogout }) {
                     {getStatusIcon(status.attendance?.morningCheckIn?.status)}
                   </span>
                   <span className="text">
-                    {status.attendance?.morningCheckIn?.status || 'Not Checked In'}
+                    {formatStatusText(status.attendance?.morningCheckIn?.status)}
                   </span>
                 </div>
                 <div className="meal-selection">
@@ -107,7 +114,7 @@ function StudentStatusPage({ user, onLogout }) {
                     {getStatusIcon(status.attendance?.afternoonCheckIn?.status)}
                   </span>
                   <span className="text">
-                    {status.attendance?.afternoonCheckIn?.status || 'Not Checked In'}
+                    {formatStatusText(status.attendance?.afternoonCheckIn?.status)}
                   </span>
                 </div>
                 <div className="meal-selection">
@@ -123,7 +130,7 @@ function StudentStatusPage({ user, onLogout }) {
                     {getStatusIcon(status.attendance?.nightCheckIn?.status)}
                   </span>
                   <span className="text">
-                    {status.attendance?.nightCheckIn?.status || 'Not Checked In'}
+                    {formatStatusText(status.attendance?.nightCheckIn?.status)}
                   </span>
                 </div>
                 <div className="meal-selection">
