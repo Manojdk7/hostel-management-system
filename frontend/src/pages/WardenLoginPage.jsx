@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../styles/AuthPages.css';
 
 function WardenLoginPage({ onLogin }) {
@@ -67,7 +67,7 @@ function WardenLoginPage({ onLogin }) {
           </form>
 
           <div className="auth-footer">
-            <p><a href="/">Back to Home</a></p>
+            <p><Link to="/">Back to Home</Link></p>
           </div>
         </div>
       </div>

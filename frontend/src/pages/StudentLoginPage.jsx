@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import '../styles/AuthPages.css';
 
 function StudentLoginPage({ onLogin }) {
@@ -67,8 +67,8 @@ function StudentLoginPage({ onLogin }) {
           </form>
 
           <div className="auth-footer">
-            <p>Don't have an account? <a href="/student/register">Register here</a></p>
-            <p><a href="/">Back to Home</a></p>
+            <p>Don't have an account? <Link to="/student/register">Register here</Link></p>
+            <p><Link to="/">Back to Home</Link></p>
           </div>
         </div>
       </div>
