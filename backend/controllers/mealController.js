@@ -30,6 +30,23 @@ exports.checkInForMeal = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid meal type' });
     }
 
+    // Enforce meal time window (IST)
+    const indiaTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    const currentHour = indiaTime.getHours();
+    const mealWindow = windows[mealType];
+
+    if (currentHour < mealWindow.start || currentHour >= mealWindow.end) {
+      const formatTime = (hour) => {
+        const suffix = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour % 12 || 12;
+        return `${displayHour}:00 ${suffix}`;
+      };
+      return res.status(400).json({
+        success: false,
+        message: `Check-in for ${mealType} is only allowed between ${formatTime(mealWindow.start)} and ${formatTime(mealWindow.end)}. Current time: ${indiaTime.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}`
+      });
+    }
+
     const student = await Student.findById(studentId);
     if (!student) return res.status(404).json({ success: false, message: 'Student not found' });
 
@@ -138,8 +155,8 @@ exports.getTodayStatus = async (req, res) => {
 
     let availableMeals = [];
     for (const [meal, window] of Object.entries(windows)) {
-      const now = new Date();
-      const hour = now.getHours();
+      const indiaTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+      const hour = indiaTime.getHours();
       if (hour >= window.start && hour < window.end) {
         availableMeals.push(meal);
       }

@@ -5,21 +5,41 @@ import '../styles/checkInPage.css';
 
 function StudentCheckInPage({ user, onLogout }) {
   const navigate = useNavigate();
-  const [mealType, setMealType] = useState('breakfast');
+  const [mealType, setMealType] = useState('');
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationStatus, setLocationStatus] = useState('checking');
   const [distance, setDistance] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [currentMealWindow, setCurrentMealWindow] = useState(null);
 
   const HOSTEL_LATITUDE = user?.hostelLatitude || 14.4644;
   const HOSTEL_LONGITUDE = user?.hostelLongitude || 75.9217;
   const GEOFENCE_RADIUS = user?.allowedRadius || 20000;
 
+  const mealWindows = [
+    { key: 'breakfast', name: 'Breakfast', emoji: '🥞', start: 6, end: 8, timeLabel: '6:00 AM - 8:00 AM' },
+    { key: 'lunch', name: 'Lunch', emoji: '🍲', start: 12, end: 14, timeLabel: '12:00 PM - 2:00 PM' },
+    { key: 'dinner', name: 'Dinner', emoji: '🍽️', start: 18, end: 20, timeLabel: '6:00 PM - 8:00 PM' }
+  ];
+
   useEffect(() => {
     getStudentLocation();
+    detectCurrentMealWindow();
+    const interval = setInterval(detectCurrentMealWindow, 60000);
+    return () => clearInterval(interval);
   }, []);
+
+  const detectCurrentMealWindow = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const active = mealWindows.find(m => hour >= m.start && hour < m.end);
+    setCurrentMealWindow(active || null);
+    if (active && !mealType) {
+      setMealType(active.key);
+    }
+  };
 
   // Get student's current GPS location
   const getStudentLocation = () => {
@@ -80,6 +100,11 @@ function StudentCheckInPage({ user, onLogout }) {
   const handleCheckIn = async (e) => {
     e.preventDefault();
 
+    if (!currentMealWindow) {
+      setError('❌ No meal window is currently active. Check-in is only allowed during meal times.');
+      return;
+    }
+
     if (locationStatus !== 'verified') {
       setError('❌ You must be within hostel premises to check in!');
       return;
@@ -117,6 +142,16 @@ function StudentCheckInPage({ user, onLogout }) {
   const handleLogout = () => {
     onLogout();
     navigate('/');
+  };
+
+  const getNextMealInfo = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const next = mealWindows.find(m => m.start > hour);
+    if (next) {
+      return `Next: ${next.name} at ${next.timeLabel}`;
+    }
+    return 'All meal windows are closed for today. Come back tomorrow!';
   };
 
   return (
@@ -215,57 +250,45 @@ function StudentCheckInPage({ user, onLogout }) {
           <div className="form-card">
             <h2>🍽️ Select Meal Type</h2>
 
+            {currentMealWindow ? (
+              <p style={{ color: '#48bb78', fontWeight: '600', marginBottom: '1rem', fontSize: '0.95rem' }}>
+                ✅ Currently active: {currentMealWindow.name} ({currentMealWindow.timeLabel})
+              </p>
+            ) : (
+              <div style={{ background: '#fff5f5', border: '2px solid #fc8181', borderRadius: '8px', padding: '1rem', marginBottom: '1rem', textAlign: 'center' }}>
+                <p style={{ color: '#c53030', fontWeight: '700', margin: '0 0 0.5rem 0' }}>⏰ No meal window is currently active</p>
+                <p style={{ color: '#718096', margin: 0, fontSize: '0.9rem' }}>{getNextMealInfo()}</p>
+              </div>
+            )}
+
             <div className="meal-options">
-              <label className="meal-option">
-                <input
-                  type="radio"
-                  name="meal"
-                  value="breakfast"
-                  checked={mealType === 'breakfast'}
-                  onChange={(e) => setMealType(e.target.value)}
-                />
-                <span className="meal-label">
-                  <span className="meal-emoji">🥞</span>
-                  <div className="meal-info">
-                    <span className="meal-name">Breakfast</span>
-                    <span className="meal-time">6:00 AM - 8:00 AM</span>
-                  </div>
-                </span>
-              </label>
+              {mealWindows.map((meal) => {
+                const now = new Date();
+                const hour = now.getHours();
+                const isActive = hour >= meal.start && hour < meal.end;
 
-              <label className="meal-option">
-                <input
-                  type="radio"
-                  name="meal"
-                  value="lunch"
-                  checked={mealType === 'lunch'}
-                  onChange={(e) => setMealType(e.target.value)}
-                />
-                <span className="meal-label">
-                  <span className="meal-emoji">🍲</span>
-                  <div className="meal-info">
-                    <span className="meal-name">Lunch</span>
-                    <span className="meal-time">12:00 PM - 2:00 PM</span>
-                  </div>
-                </span>
-              </label>
-
-              <label className="meal-option">
-                <input
-                  type="radio"
-                  name="meal"
-                  value="dinner"
-                  checked={mealType === 'dinner'}
-                  onChange={(e) => setMealType(e.target.value)}
-                />
-                <span className="meal-label">
-                  <span className="meal-emoji">🍽️</span>
-                  <div className="meal-info">
-                    <span className="meal-name">Dinner</span>
-                    <span className="meal-time">6:00 PM - 8:00 PM</span>
-                  </div>
-                </span>
-              </label>
+                return (
+                  <label className={`meal-option ${!isActive ? 'disabled' : ''}`} key={meal.key}>
+                    <input
+                      type="radio"
+                      name="meal"
+                      value={meal.key}
+                      checked={mealType === meal.key}
+                      onChange={(e) => setMealType(e.target.value)}
+                      disabled={!isActive}
+                    />
+                    <span className="meal-label" style={{ opacity: isActive ? 1 : 0.4 }}>
+                      <span className="meal-emoji">{meal.emoji}</span>
+                      <div className="meal-info">
+                        <span className="meal-name">{meal.name}</span>
+                        <span className="meal-time">{meal.timeLabel}</span>
+                        {isActive && <span style={{ color: '#48bb78', fontSize: '0.75rem', fontWeight: '700' }}>● OPEN NOW</span>}
+                        {!isActive && <span style={{ color: '#e53e3e', fontSize: '0.75rem', fontWeight: '700' }}>● CLOSED</span>}
+                      </div>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
 
             {/* ERROR MESSAGE */}
@@ -278,11 +301,11 @@ function StudentCheckInPage({ user, onLogout }) {
             <button
               type="submit"
               className={`btn-checkin ${
-                locationStatus !== 'verified' ? 'disabled' : ''
+                locationStatus !== 'verified' || !currentMealWindow ? 'disabled' : ''
               }`}
-              disabled={loading || locationStatus !== 'verified'}
+              disabled={loading || locationStatus !== 'verified' || !currentMealWindow}
             >
-              {loading ? '⏳ Checking in...' : '✅ Check In Now'}
+              {loading ? '⏳ Checking in...' : !currentMealWindow ? '🚫 No Active Meal Window' : '✅ Check In Now'}
             </button>
           </div>
         </form>
@@ -294,8 +317,9 @@ function StudentCheckInPage({ user, onLogout }) {
             <li>✓ You must be within 20 km of Davanagere hostel center to check in</li>
             <li>✓ Location is verified using GPS</li>
             <li>✓ Hostel Center: Davanagere, Karnataka (14.4644°N, 75.9217°E)</li>
-            <li>✓ Check-in is only allowed during meal times</li>
-            <li>✓ Select your meal preference for each check-in</li>
+            <li>✓ <strong>Breakfast check-in: 6:00 AM - 8:00 AM only</strong></li>
+            <li>✓ <strong>Lunch check-in: 12:00 PM - 2:00 PM only</strong></li>
+            <li>✓ <strong>Dinner check-in: 6:00 PM - 8:00 PM only</strong></li>
             <li>✓ Attendance is marked only after successful check-in</li>
             <li>✓ Your location is securely recorded for verification</li>
           </ul>
